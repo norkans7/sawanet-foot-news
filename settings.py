@@ -117,6 +117,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     # Uncomment the next line for simple clickjacking protection:
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 )
 
 ROOT_URLCONF = 'urls'
@@ -139,9 +140,17 @@ INSTALLED_APPS = (
     # Uncomment the next line to enable the admin:
     'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
+
     'django.contrib.admindocs',
 
-    'sms'
+    'guardian', 
+    'smartmin',
+    
+    'smartmin.users',
+    
+    'sms',
+
+    'debug_toolbar',
 )
 
 # A sample logging configuration. The only tangible logging
@@ -172,3 +181,42 @@ INSTALLED_APPS = (
 #         },
 #     }
 # }
+
+
+# create the smartmin CRUDL permissions on all objects
+PERMISSIONS = {
+  '*': ('create', # can create an object
+        'read',   # can read an object, viewing it's details
+        'update', # can update an object
+        'delete', # can delete an object,
+        'list'),  # can view a list of the objects
+
+    'auth.user': ('failed', 'profile')
+}
+
+# assigns the permissions that each group should have, here creating an Administrator group with
+# authority to create and change users
+GROUP_PERMISSIONS = {
+    "Administrator": ('auth.user.*',
+                      'sms.sms.*',
+                      'sms.tag.*',
+                  ),
+
+    "Editors": ('sms.sms.*',
+                'sms.tag.*',
+                )
+                
+                      
+}
+
+# this is required by guardian
+ANONYMOUS_USER_ID = -1
+
+# set this if you want to use smartmin's user login
+LOGIN_URL = '/users/login'
+LOGOUT_URL = 'users/logout'
+LOGIN_REDIRECT_URL = '/sms/'
+
+
+# debug toolbar
+INTERNAL_IPS = ('127.0.0.1',)
